@@ -12,9 +12,26 @@ A multi-agent AI system that transforms scattered emails, meeting transcripts, a
 
 ## Tech Stack
 
-- **Frontend**: React (Vite), Tailwind CSS, shadcn/ui
-- **Backend**: Supabase (Database, Auth, Edge Functions)
+- **Frontend**: React (Vite), Tailwind CSS, shadcn/ui (in `frontend/` directory)
+- **Backend**: Supabase (Database, Auth, Edge Functions) (in `supabase/` directory)
 - **AI Integration**: Supabase Edge Functions + AI Gateway (Google Gemini / OpenAI)
+
+## Repository Structure
+
+```
+.
+├── frontend/           # React application (Vite)
+│   ├── src/            # Source code
+│   ├── public/         # Static assets
+│   ├── vite.config.ts  # Vite configuration
+│   └── ...
+├── supabase/           # Backend Logic
+│   ├── functions/      # Edge Functions (API)
+│   ├── migrations/     # Database Schema
+│   └── ...
+├── netlify.toml        # Netlify deployment config
+└── render.yaml         # Render deployment blueprint
+```
 
 ## Setup & Installation
 
@@ -33,9 +50,10 @@ cd brd-agent
 
 ### 2. Environment Variables
 
-Copy the example environment file:
+Navigate to the frontend directory and create the .env file:
 
 ```bash
+cd frontend
 cp .env.example .env
 ```
 
@@ -46,43 +64,40 @@ VITE_SUPABASE_URL=https://your-project.supabase.co
 VITE_SUPABASE_PUBLISHABLE_KEY=your-anon-key
 ```
 
-For the Edge Function (`supabase/functions/generate-brd`), you will need to set the following secrets in your Supabase project dashboard:
-
+For the Edge Function (`supabase/functions/generate-brd`), set secrets in your Supabase dashboard:
 - `SUPABASE_URL`
 - `SUPABASE_SERVICE_ROLE_KEY`
-- `LOVABLE_API_KEY` (or your preferred AI gateway key if you modify the function)
+- `LOVABLE_API_KEY`
 
-### 3. Install Dependencies
+### 3. Install Dependencies & Run
 
 ```bash
+cd frontend
 npm install
-```
-
-### 4. Start Development Server
-
-Run the dev script:
-
-```bash
-npm run d""ev
+npm run de""v
 ```
 
 The application will be available at `http://localhost:8080`.
 
 ## Deployment
 
-### Frontend
+### Netlify / Vercel
 
-Build the project for production:
+The repository is configured for easy deployment.
+- **Base Directory**: `frontend`
+- **Build Command**: `npm run build`
+- **Publish Directory**: `dist`
 
-```bash
-npm run build
-```
+**Netlify**: The included `netlify.toml` handles this automatically.
+**Vercel**: Set the "Root Directory" to `frontend` in your project settings.
 
-Deploy the `dist` folder to any static host (Vercel, Netlify, Render, etc.).
+### Render
+
+Use the `render.yaml` blueprint to deploy the frontend as a Static Site.
 
 ### Backend
 
-Deploy the database migrations and edge functions using the Supabase CLI:
+Deploy Supabase functions:
 
 ```bash
 supabase functions deploy generate-brd
