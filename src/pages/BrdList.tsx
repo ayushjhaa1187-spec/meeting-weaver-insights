@@ -4,9 +4,10 @@ import { Link } from "react-router-dom";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Eye, Plus, FileText } from "lucide-react";
+import { BRD, Project } from "@/types";
 
 export default function BrdList() {
-  const [brds, setBrds] = useState<any[]>([]);
+  const [brds, setBrds] = useState<(BRD & { projects: Pick<Project, "name"> | null })[]>([]);
 
   useEffect(() => {
     const load = async () => {
@@ -17,7 +18,9 @@ export default function BrdList() {
         .select("id, accuracy, precision_score, recall, f1_score, status, version, created_at, projects(name)")
         .eq("user_id", user.id)
         .order("created_at", { ascending: false });
-      setBrds(data || []);
+
+      // We need to cast the result because Supabase types might not perfectly infer the join structure deeply
+      setBrds((data as unknown as (BRD & { projects: Pick<Project, "name"> | null })[]) || []);
     };
     load();
   }, []);
@@ -57,13 +60,13 @@ export default function BrdList() {
             <tbody>
               {brds.map((brd) => (
                 <tr key={brd.id} className="border-b border-border last:border-0 hover:bg-muted/30 transition-colors">
-                  <td className="px-5 py-3.5 text-sm font-medium text-foreground">{(brd.projects as any)?.name || "—"}</td>
+                  <td className="px-5 py-3.5 text-sm font-medium text-foreground">{brd.projects?.name || "—"}</td>
                   <td className="px-5 py-3.5">
                     <Badge variant={brd.status === "completed" ? "default" : "secondary"}>{brd.status}</Badge>
                   </td>
-                  <td className="px-5 py-3.5 text-sm font-mono">{brd.accuracy ?? "—"}%</td>
-                  <td className="px-5 py-3.5 text-sm font-mono">{brd.precision_score ?? "—"}%</td>
-                  <td className="px-5 py-3.5 text-sm font-mono">{brd.recall ?? "—"}%</td>
+                  <td className="px-5 py-3.5 text-sm font-mono">{brd.accuracy?.toString() ?? "—"}%</td>
+                  <td className="px-5 py-3.5 text-sm font-mono">{brd.precision_score?.toString() ?? "—"}%</td>
+                  <td className="px-5 py-3.5 text-sm font-mono">{brd.recall?.toString() ?? "—"}%</td>
                   <td className="px-5 py-3.5 text-xs text-muted-foreground">{new Date(brd.created_at).toLocaleDateString()}</td>
                   <td className="px-5 py-3.5 text-right">
                     <Link to={`/brds/${brd.id}`}><Eye className="w-4 h-4 text-muted-foreground hover:text-foreground inline" /></Link>

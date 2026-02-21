@@ -26,8 +26,8 @@ export default function Auth() {
         if (error) throw error;
         toast.success("Check your email for a confirmation link!");
       }
-    } catch (err: any) {
-      toast.error(err.message);
+    } catch (err: unknown) {
+      toast.error(err instanceof Error ? err.message : "An error occurred");
     } finally {
       setLoading(false);
     }

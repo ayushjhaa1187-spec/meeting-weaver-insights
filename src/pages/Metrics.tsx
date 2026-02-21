@@ -3,34 +3,38 @@ import { supabase } from "@/integrations/supabase/client";
 import StatCard from "@/components/StatCard";
 import { Target, Crosshair, RotateCcw, TrendingUp } from "lucide-react";
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, LineChart, Line } from "recharts";
+import { BRD, Project } from "@/types";
+
+type MetricsRow = Pick<BRD, "accuracy" | "precision_score" | "recall" | "f1_score" | "created_at"> & { projects: Pick<Project, "name"> | null };
 
 export default function MetricsPage() {
-  const [brds, setBrds] = useState<any[]>([]);
+  const [brds, setBrds] = useState<MetricsRow[]>([]);
 
   useEffect(() => {
     const load = async () => {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) return;
       const { data } = await supabase.from("brds").select("accuracy, precision_score, recall, f1_score, created_at, projects(name)").eq("user_id", user.id).order("created_at");
-      setBrds(data || []);
+      // Explicit cast for join
+      setBrds((data as unknown as MetricsRow[]) || []);
     };
     load();
   }, []);
 
-  const avg = (field: string) => {
-    const vals = brds.filter(b => b[field] != null).map(b => b[field]);
+  const avg = (field: keyof MetricsRow) => {
+    const vals = brds.filter(b => b[field] != null).map(b => b[field] as number);
     return vals.length ? (vals.reduce((a, b) => a + b, 0) / vals.length).toFixed(1) : "—";
   };
 
   const chartData = brds.map((b, i) => ({
-    name: (b.projects as any)?.name || `BRD ${i + 1}`,
+    name: b.projects?.name || `BRD ${i + 1}`,
     accuracy: b.accuracy || 0,
     precision: b.precision_score || 0,
     recall: b.recall || 0,
     f1: b.f1_score || 0,
   }));
 
-  const trendData = brds.map((b, i) => ({
+  const trendData = brds.map((b) => ({
     name: new Date(b.created_at).toLocaleDateString(),
     accuracy: b.accuracy || 0,
   }));
