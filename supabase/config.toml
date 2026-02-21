@@ -1,0 +1,4 @@
+project_id = "zpusdjobvnodsjobiplk"
+
+[functions.generate-brd]
+verify_jwt = false
