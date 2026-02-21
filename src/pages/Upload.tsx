@@ -70,8 +70,8 @@ export default function UploadPage() {
 
       toast.success("Processing started!");
       navigate(`/brds/generate/${project.id}`);
-    } catch (err: any) {
-      toast.error(err.message);
+    } catch (err: unknown) {
+      toast.error(err instanceof Error ? err.message : "An error occurred");
     } finally {
       setProcessing(false);
     }

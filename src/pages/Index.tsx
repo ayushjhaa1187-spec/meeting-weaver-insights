@@ -6,15 +6,9 @@ import { FileText, Activity, Target, Clock, Eye } from "lucide-react";
 import { Link } from "react-router-dom";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
+import { BRD, Project } from "@/types";
 
-interface BrdRow {
-  id: string;
-  content: any;
-  accuracy: number | null;
-  status: string;
-  created_at: string;
-  projects: { name: string } | null;
-}
+type BrdRow = Pick<BRD, "id" | "content" | "accuracy" | "status" | "created_at"> & { projects: Pick<Project, "name"> | null };
 
 export default function Dashboard() {
   const [brds, setBrds] = useState<BrdRow[]>([]);
@@ -31,7 +25,8 @@ export default function Dashboard() {
         supabase.from("projects").select("id", { count: "exact" }).eq("user_id", user.id),
         supabase.from("documents").select("id", { count: "exact" }).eq("user_id", user.id),
       ]);
-      setBrds((b.data as any[]) || []);
+      // Explicit cast to handle join
+      setBrds((b.data as unknown as BrdRow[]) || []);
       setProjectCount(p.count || 0);
       setDocCount(d.count || 0);
     };
@@ -80,7 +75,7 @@ export default function Dashboard() {
               {brds.map((brd) => (
                 <div key={brd.id} className="flex items-center justify-between p-3 rounded-lg bg-muted/50 hover:bg-muted transition-colors">
                   <div>
-                    <span className="text-sm font-medium text-foreground">{(brd.projects as any)?.name || "Untitled"}</span>
+                    <span className="text-sm font-medium text-foreground">{brd.projects?.name || "Untitled"}</span>
                     <div className="text-xs text-muted-foreground mt-0.5">{new Date(brd.created_at).toLocaleDateString()}</div>
                   </div>
                   <div className="flex items-center gap-3">

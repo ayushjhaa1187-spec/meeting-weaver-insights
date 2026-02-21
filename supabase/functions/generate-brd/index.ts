@@ -6,6 +6,11 @@ const corsHeaders = {
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type, x-supabase-client-platform, x-supabase-client-platform-version, x-supabase-client-runtime, x-supabase-client-runtime-version",
 };
 
+interface GenerateBrdRequest {
+  projectId: string;
+  documents?: string;
+}
+
 serve(async (req) => {
   if (req.method === "OPTIONS") return new Response(null, { headers: corsHeaders });
 
@@ -22,7 +27,7 @@ serve(async (req) => {
     const { data: { user }, error: authError } = await supabase.auth.getUser(token);
     if (authError || !user) throw new Error("Invalid token");
 
-    const { projectId, documents } = await req.json();
+    const { projectId, documents } = await req.json() as GenerateBrdRequest;
 
     const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
     if (!LOVABLE_API_KEY) throw new Error("LOVABLE_API_KEY not configured");
@@ -31,7 +36,7 @@ serve(async (req) => {
     const encoder = new TextEncoder();
     const stream = new ReadableStream({
       async start(controller) {
-        const send = (data: any) => {
+        const send = (data: unknown) => {
           controller.enqueue(encoder.encode(`data: ${JSON.stringify(data)}\n\n`));
         };
 
@@ -104,8 +109,10 @@ Be specific, reference source documents, and provide actionable requirements.`;
             return;
           }
 
+          if (!aiResponse.body) throw new Error("No response body from AI service");
+
           // Forward AI stream
-          const reader = aiResponse.body!.getReader();
+          const reader = aiResponse.body.getReader();
           const decoder = new TextDecoder();
           let buffer = "";
 
