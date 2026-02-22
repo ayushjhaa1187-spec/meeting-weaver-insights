@@ -4,11 +4,11 @@ import { supabase } from "@/integrations/supabase/client";
 import { useNavigate } from "react-router-dom";
 
 const navItems = [
-  { icon: LayoutDashboard, label: "Dashboard", path: "/" },
-  { icon: Upload, label: "Upload", path: "/upload" },
-  { icon: FileText, label: "BRDs", path: "/brds" },
-  { icon: BarChart3, label: "Metrics", path: "/metrics" },
-  { icon: Settings, label: "Settings", path: "/settings" },
+  { icon: LayoutDashboard, label: "Dashboard", path: "/dashboard" },
+  { icon: Upload, label: "Upload", path: "/dashboard/upload" },
+  { icon: FileText, label: "BRDs", path: "/dashboard/brds" },
+  { icon: BarChart3, label: "Metrics", path: "/dashboard/metrics" },
+  { icon: Settings, label: "Settings", path: "/dashboard/settings" },
 ];
 
 export default function AppSidebar() {

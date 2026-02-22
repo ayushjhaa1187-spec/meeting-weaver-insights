@@ -32,7 +32,7 @@ export default function BrdList() {
           <h1 className="text-2xl font-bold text-foreground">BRDs</h1>
           <p className="text-sm text-muted-foreground">All generated Business Requirements Documents</p>
         </div>
-        <Link to="/upload">
+        <Link to="/dashboard/upload">
           <Button size="sm"><Plus className="w-4 h-4 mr-1.5" /> New BRD</Button>
         </Link>
       </div>
@@ -41,7 +41,7 @@ export default function BrdList() {
         <div className="bg-card rounded-xl border border-border p-12 text-center">
           <FileText className="w-10 h-10 text-muted-foreground mx-auto mb-3" />
           <p className="text-muted-foreground text-sm">No BRDs generated yet</p>
-          <Link to="/upload"><Button size="sm" className="mt-3">Upload Data</Button></Link>
+          <Link to="/dashboard/upload"><Button size="sm" className="mt-3">Upload Data</Button></Link>
         </div>
       ) : (
         <div className="bg-card rounded-xl border border-border overflow-hidden">
@@ -69,7 +69,7 @@ export default function BrdList() {
                   <td className="px-5 py-3.5 text-sm font-mono">{brd.recall?.toString() ?? "—"}%</td>
                   <td className="px-5 py-3.5 text-xs text-muted-foreground">{new Date(brd.created_at).toLocaleDateString()}</td>
                   <td className="px-5 py-3.5 text-right">
-                    <Link to={`/brds/${brd.id}`}><Eye className="w-4 h-4 text-muted-foreground hover:text-foreground inline" /></Link>
+                    <Link to={`/dashboard/brds/${brd.id}`}><Eye className="w-4 h-4 text-muted-foreground hover:text-foreground inline" /></Link>
                   </td>
                 </tr>
               ))}

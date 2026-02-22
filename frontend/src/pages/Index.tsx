@@ -64,11 +64,11 @@ export default function Dashboard() {
         <div className="lg:col-span-2 bg-card rounded-xl border border-border p-5">
           <div className="flex items-center justify-between mb-4">
             <h2 className="text-base font-semibold text-foreground">Recent BRDs</h2>
-            <Link to="/brds" className="text-xs text-primary font-medium hover:underline">View all</Link>
+            <Link to="/dashboard/brds" className="text-xs text-primary font-medium hover:underline">View all</Link>
           </div>
           {brds.length === 0 ? (
             <div className="py-10 text-center text-muted-foreground text-sm">
-              No BRDs yet. <Link to="/upload" className="text-primary hover:underline">Upload data to get started</Link>
+              No BRDs yet. <Link to="/dashboard/upload" className="text-primary hover:underline">Upload data to get started</Link>
             </div>
           ) : (
             <div className="space-y-3">
@@ -83,7 +83,7 @@ export default function Dashboard() {
                     <Badge variant={brd.status === "completed" ? "default" : "secondary"}>
                       {brd.status}
                     </Badge>
-                    <Link to={`/brds/${brd.id}`}>
+                    <Link to={`/dashboard/brds/${brd.id}`}>
                       <Eye className="w-4 h-4 text-muted-foreground hover:text-foreground" />
                     </Link>
                   </div>
