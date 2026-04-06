@@ -7,8 +7,6 @@ export type Json =
   | Json[]
 
 export type Database = {
-  // Allows to automatically instantiate createClient with right options
-  // instead of createClient<Database, { PostgrestVersion: 'XX' }>(URL, KEY)
   __InternalSupabase: {
     PostgrestVersion: "14.1"
   }
@@ -67,6 +65,30 @@ export type Database = {
           },
         ]
       }
+      chat_history: {
+        Row: {
+          id: string
+          user_id: string
+          role: string
+          content: string
+          created_at: string
+        }
+        Insert: {
+          id?: string
+          user_id: string
+          role: string
+          content: string
+          created_at?: string
+        }
+        Update: {
+          id?: string
+          user_id?: string
+          role?: string
+          content?: string
+          created_at?: string
+        }
+        Relationships: []
+      }
       documents: {
         Row: {
           content: string | null
@@ -113,6 +135,89 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      insights: {
+        Row: {
+          id: string
+          user_id: string
+          meeting_id: string
+          type: string
+          content: string
+          sentiment_score: number | null
+          created_at: string
+        }
+        Insert: {
+          id?: string
+          user_id: string
+          meeting_id: string
+          type?: string
+          content: string
+          sentiment_score?: number | null
+          created_at?: string
+        }
+        Update: {
+          id?: string
+          user_id?: string
+          meeting_id?: string
+          type?: string
+          content?: string
+          sentiment_score?: number | null
+          created_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "insights_meeting_id_fkey"
+            columns: ["meeting_id"]
+            isOneToOne: false
+            referencedRelation: "meetings"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      meetings: {
+        Row: {
+          id: string
+          user_id: string
+          title: string
+          date: string
+          duration: number | null
+          attendees: Json
+          transcript: string | null
+          summary: string | null
+          action_items: Json
+          status: string
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          id?: string
+          user_id: string
+          title: string
+          date?: string
+          duration?: number | null
+          attendees?: Json
+          transcript?: string | null
+          summary?: string | null
+          action_items?: Json
+          status?: string
+          created_at?: string
+          updated_at?: string
+        }
+        Update: {
+          id?: string
+          user_id?: string
+          title?: string
+          date?: string
+          duration?: number | null
+          attendees?: Json
+          transcript?: string | null
+          summary?: string | null
+          action_items?: Json
+          status?: string
+          created_at?: string
+          updated_at?: string
+        }
+        Relationships: []
       }
       metrics: {
         Row: {
@@ -189,6 +294,30 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      profiles: {
+        Row: {
+          id: string
+          full_name: string | null
+          avatar_url: string | null
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          id: string
+          full_name?: string | null
+          avatar_url?: string | null
+          created_at?: string
+          updated_at?: string
+        }
+        Update: {
+          id?: string
+          full_name?: string | null
+          avatar_url?: string | null
+          created_at?: string
+          updated_at?: string
+        }
+        Relationships: []
       }
       projects: {
         Row: {
