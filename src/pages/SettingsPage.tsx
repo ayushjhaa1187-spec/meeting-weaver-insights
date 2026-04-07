@@ -1,8 +1,10 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Slider } from "@/components/ui/slider";
 import { toast } from "sonner";
+import { getProfile, updateProfile } from "@/lib/api";
+import { Loader2 } from "lucide-react";
 
 export default function SettingsPage() {
   const [model, setModel] = useState("gemini-flash");
@@ -13,20 +15,62 @@ export default function SettingsPage() {
   const [includeMetadata, setIncludeMetadata] = useState(true);
   const [includeSources, setIncludeSources] = useState(true);
   const [autoValidate, setAutoValidate] = useState(true);
+  const [fullName, setFullName] = useState("");
+  const [profileLoading, setProfileLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
 
-  const handleSave = () => {
-    localStorage.setItem("brd-settings", JSON.stringify({
+  useEffect(() => {
+    const stored = localStorage.getItem("mw-settings");
+    if (stored) {
+      try {
+        const s = JSON.parse(stored);
+        if (s.model) setModel(s.model);
+        if (s.temperature !== undefined) setTemperature([s.temperature]);
+        if (s.maxTokens) setMaxTokens(s.maxTokens);
+        if (s.noiseThreshold !== undefined) setNoiseThreshold([s.noiseThreshold]);
+        if (s.exportFormat) setExportFormat(s.exportFormat);
+        if (s.includeMetadata !== undefined) setIncludeMetadata(s.includeMetadata);
+        if (s.includeSources !== undefined) setIncludeSources(s.includeSources);
+        if (s.autoValidate !== undefined) setAutoValidate(s.autoValidate);
+      } catch { /* ignore */ }
+    }
+    getProfile().then((res) => {
+      if (res.success && res.data) {
+        setFullName(res.data.full_name || "");
+      }
+      setProfileLoading(false);
+    });
+  }, []);
+
+  const handleSave = async () => {
+    setSaving(true);
+    localStorage.setItem("mw-settings", JSON.stringify({
       model, temperature: temperature[0], maxTokens, noiseThreshold: noiseThreshold[0],
       exportFormat, includeMetadata, includeSources, autoValidate,
     }));
+    await updateProfile({ full_name: fullName });
     toast.success("Settings saved");
+    setSaving(false);
   };
 
   return (
     <div className="space-y-6 max-w-3xl">
       <div>
         <h1 className="text-2xl font-bold text-foreground">Settings</h1>
-        <p className="text-sm text-muted-foreground">Configure AI model and export preferences</p>
+        <p className="text-sm text-muted-foreground">Configure your profile and AI preferences</p>
+      </div>
+
+      {/* Profile */}
+      <div className="bg-card rounded-xl border border-border p-5 space-y-4">
+        <h2 className="text-base font-semibold text-foreground">Profile</h2>
+        <div>
+          <label className="text-sm font-medium text-foreground">Full Name</label>
+          {profileLoading ? (
+            <div className="mt-1.5 h-10 bg-muted animate-pulse rounded-lg" />
+          ) : (
+            <Input value={fullName} onChange={(e) => setFullName(e.target.value)} placeholder="Your name" className="mt-1.5 max-w-md" />
+          )}
+        </div>
       </div>
 
       {/* AI Model */}
@@ -108,7 +152,10 @@ export default function SettingsPage() {
       </div>
 
       <div className="flex gap-3">
-        <Button onClick={handleSave}>Save Settings</Button>
+        <Button onClick={handleSave} disabled={saving}>
+          {saving && <Loader2 className="w-4 h-4 animate-spin mr-2" />}
+          Save Settings
+        </Button>
         <Button variant="outline" onClick={() => toast.info("Defaults restored")}>Reset Defaults</Button>
       </div>
     </div>
